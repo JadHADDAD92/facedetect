@@ -23,7 +23,7 @@ def detectFace(filepath):
     for cascade in CASCADES:
         fc = cv2.CascadeClassifier(os.path.join(dirname,'haarcascades',cascade))
         faces = fc.detectMultiScale(im)
-        if len(faces) > 0:
+        if not faces > 0:
             print(faces)
             sys.exit(0)
     sys.exit(1)
