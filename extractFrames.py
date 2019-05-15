@@ -102,6 +102,6 @@ parser.add_argument('file')
 parser.add_argument('outputDirectory')
 parser.add_argument('--percentage', default=1.5,
                     help="percentage threshold of difference between"
-                         "two consecutive frames")
+                         " two consecutive frames")
 args = parser.parse_args()
 processFile(args.file, args.outputDirectory, args.percentage)
