@@ -1,8 +1,19 @@
-# facedetect
-a simple script to detect if an image contains a face using haarcascades
+# frameExtractor
+this is a small sub-project aimed to extract valuable and meaningful frames from video files.
+can be used for creating a dataset for machine learning
+extract only frames that contain changes (precised in --percentage) from videos, and classify them in two directories: faces / non-faces
+
+# requirements
+* opencv
+* ffmpeg
 
 # usage
-`python3 facedetect.py /path/to/file`
+`python3 extractFrames.py /path/to/file.mp4 path/to/output/ --percentage 5`
 
-* returns 0 if at least one face was detected
-* returns 1 if no faces were detected
+## positional arguments:
+ * file
+ * outputDirectory
+
+## optional arguments:
+ * --percentage PERCENTAGE (percentage threshold of difference between two
+                           consecutive frames)
