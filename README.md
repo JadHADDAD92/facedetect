@@ -1,7 +1,7 @@
 # frameExtractor
 this is a small sub-project aimed to extract valuable and meaningful frames (by discarding very similar consecutive frames) from video files.
 can be used for creating a dataset for machine learning. </br>
-extract only frames that contain changes (specified in --percentage) from videos, and classify them in two directories: faces / non-faces
+extract only frames that contain changes (specified in --percentage) from videos, and classify them in two directories: faces / non_faces
 
 # requirements
 * opencv
