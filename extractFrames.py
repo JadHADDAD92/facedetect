@@ -25,6 +25,7 @@ def faceDetected(image):
     """ detect faces in image
     """
     image = cv2.equalizeHist(image)
+    # try to detect faces using different haar cascades
     for cascade in CASCADES:
         fc = cv2.CascadeClassifier(str(dirname/'haarcascades'/cascade))
         faces = fc.detectMultiScale(image)
