@@ -45,6 +45,7 @@ def processFile(filePath, outputPath, percentage):
     
     extractFrames = ['ffmpeg',
                      '-i', filePath,
+                     '-qscale:v', '2',
                      '-vf', 'select=gt(scene\\,%s)'%percentage,
                      '-vsync', 'vfr',
                      str(keyframesDir)+'/thumb%04d.jpg',
