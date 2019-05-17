@@ -16,4 +16,4 @@ extract only frames that contain changes (specified in --percentage) from videos
 
 ## optional arguments:
  * --percentage PERCENTAGE (percentage threshold of difference between two
-                           consecutive frames)
+                           consecutive frames, default value = 1.5%)
