@@ -8,6 +8,7 @@ from subprocess import Popen
 
 import click
 import cv2
+from tqdm import tqdm
 
 from common.facedetector import FaceDetector
 
@@ -23,16 +24,15 @@ def processDirectory(directoryPath):
                   and Path(f).suffix in imgExtensions]
     faceDetector = FaceDetector(prototype='models/deploy.prototxt.txt',
                                 model='models/res10_300x300_ssd_iter_140000.caffemodel')
-    numOfFiles = len(filesPaths)
     
     dirNames = [ directoryPath/'faces', directoryPath/'non_faces' ]
     for dirName in dirNames:
         if dirName.exists() is False:
             dirName.mkdir()
-    counter = 1
     nonFacesCounter = 0
     facesCounter = 0
-    for filePath in filesPaths:
+    filesTQDM = tqdm(filesPaths)
+    for filePath in filesTQDM:
         filePath = str(keyframesPath/filePath)
         im = cv2.imread(filePath)
         
@@ -42,11 +42,10 @@ def processDirectory(directoryPath):
         else:
             move(filePath, str(dirNames[1]))
             nonFacesCounter = nonFacesCounter + 1
-        
-        print("\r%d/%d"%(counter, numOfFiles), end='\r')
-        counter = counter +1
-    print('%d images containing faces detected \n%d images not containing faces detected'%
-          (facesCounter, nonFacesCounter))
+        filesTQDM.set_description(f'face_frames:{facesCounter}, '
+                                  f'non_face_frames:{nonFacesCounter}')
+        filesTQDM.update(1)
+    filesTQDM.close()
     try:
         keyframesPath.rmdir()
     except OSError as error:
@@ -84,7 +83,6 @@ def processFile(file, output_directory, percentage):
     print('extracting frames from %s'%file)
     extractFramesP.wait()
     
-    print('classifying images in faces/non_faces...')
     processDirectory(outputPath)
 
 # pylint: disable=no-value-for-parameter
