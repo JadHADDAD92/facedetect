@@ -1,11 +1,12 @@
 """ extract frames containing faces from video file
 """
-import argparse
 from decimal import Decimal as D
 from os import listdir
 from pathlib import Path
-from shutil import move, Error
+from shutil import Error, move
 from subprocess import Popen
+
+import click
 import cv2
 
 dirname = Path(__file__).parent
@@ -33,31 +34,6 @@ def faceDetected(image):
             return True
     return False
 
-def processFile(filePath, outputPath, percentage):
-    """ process video file
-    """
-    percentage = D(percentage)/D(100)
-    outputPath = Path(outputPath)
-    
-    keyframesDir = outputPath/'keyframes'
-    if keyframesDir.exists() is False:
-        keyframesDir.mkdir()
-    
-    extractFrames = ['ffmpeg',
-                     '-i', filePath,
-                     '-qscale:v', '2',
-                     '-vf', 'select=gt(scene\\,%s)'%percentage,
-                     '-vsync', 'vfr',
-                     str(keyframesDir)+'/thumb%04d.jpg',
-                     '-loglevel', 'error'
-                    ]
-    
-    extractFramesP = Popen(extractFrames)
-    print('extracting frames from %s'%filePath)
-    extractFramesP.wait()
-    
-    print('classifying images in faces/non_faces...')
-    processDirectory(outputPath)
 
 def processDirectory(directoryPath):
     """ process files in directory
@@ -99,11 +75,40 @@ def processDirectory(directoryPath):
         print(error)
         print('couldn\'t delete temporary directory %s'%keyframesPath)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('file')
-parser.add_argument('outputDirectory')
-parser.add_argument('--percentage', default=1.5,
-                    help="percentage threshold of difference between"
-                         " two consecutive frames")
-args = parser.parse_args()
-processFile(args.file, args.outputDirectory, args.percentage)
+@click.command(context_settings=dict(show_default=True),
+               help="extract frames from video file and classify them in two separate "
+                    "directories: faces and non_faces")
+@click.argument('file')
+@click.argument('output_directory')
+@click.option('--percentage', default=1.5,
+              help="percentage threshold of difference between two consecutive frames")
+# pylint: disable=invalid-name
+def processFile(file, output_directory, percentage):
+    """ process video file
+    """
+    percentage = D(percentage)/D(100)
+    outputPath = Path(output_directory)
+    
+    keyframesDir = outputPath/'keyframes'
+    if keyframesDir.exists() is False:
+        keyframesDir.mkdir()
+    
+    extractFrames = ['ffmpeg',
+                     '-i', file,
+                     '-qscale:v', '2',
+                     '-vf', 'select=gt(scene\\,%s)'%percentage,
+                     '-vsync', 'vfr',
+                     str(keyframesDir)+'/thumb%04d.jpg',
+                     '-loglevel', 'error'
+                    ]
+    
+    extractFramesP = Popen(extractFrames)
+    print('extracting frames from %s'%file)
+    extractFramesP.wait()
+    
+    print('classifying images in faces/non_faces...')
+    processDirectory(outputPath)
+
+# pylint: disable=no-value-for-parameter
+if __name__ == '__main__':
+    processFile()
