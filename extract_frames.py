@@ -3,37 +3,17 @@
 from decimal import Decimal as D
 from os import listdir
 from pathlib import Path
-from shutil import Error, move
+from shutil import move
 from subprocess import Popen
 
 import click
 import cv2
 
+from common.facedetector import FaceDetector
+
 dirname = Path(__file__).parent
 
-CASCADES = [
-    'haarcascade_frontalface_alt2.xml',
-    'haarcascade_frontalface_alt_tree.xml',
-    'haarcascade_frontalface_alt.xml',
-    'haarcascade_frontalface_default.xml',
-    'haarcascade_profileface.xml'
-]
-
 imgExtensions = [".jpg", ".jpeg", ".png"]
-
- # pylint: disable=len-as-condition
-def faceDetected(image):
-    """ detect faces in image
-    """
-    image = cv2.equalizeHist(image)
-    # try to detect faces using different haar cascades
-    for cascade in CASCADES:
-        fc = cv2.CascadeClassifier(str(dirname/'haarcascades'/cascade))
-        faces = fc.detectMultiScale(image)
-        if len(faces) > 0:
-            return True
-    return False
-
 
 def processDirectory(directoryPath):
     """ process files in directory
@@ -41,7 +21,8 @@ def processDirectory(directoryPath):
     keyframesPath = directoryPath/'keyframes'
     filesPaths = [f for f in listdir(str(keyframesPath)) if (keyframesPath/f).is_file()
                   and Path(f).suffix in imgExtensions]
-    
+    faceDetector = FaceDetector(prototype='models/deploy.prototxt.txt',
+                                model='models/res10_300x300_ssd_iter_140000.caffemodel')
     numOfFiles = len(filesPaths)
     
     dirNames = [ directoryPath/'faces', directoryPath/'non_faces' ]
@@ -53,17 +34,14 @@ def processDirectory(directoryPath):
     facesCounter = 0
     for filePath in filesPaths:
         filePath = str(keyframesPath/filePath)
-        im = cv2.imread(filePath, cv2.IMREAD_GRAYSCALE)
-        try:
-            if faceDetected(im):
-                move(filePath, str(dirNames[0]))
-                facesCounter = facesCounter + 1
-            else:
-                move(filePath, str(dirNames[1]))
-                nonFacesCounter = nonFacesCounter + 1
-        except Error as error:
-            print(error)
-            print('skipping file')
+        im = cv2.imread(filePath)
+        
+        if faceDetector.detect(im):
+            move(filePath, str(dirNames[0]))
+            facesCounter = facesCounter + 1
+        else:
+            move(filePath, str(dirNames[1]))
+            nonFacesCounter = nonFacesCounter + 1
         
         print("\r%d/%d"%(counter, numOfFiles), end='\r')
         counter = counter +1
