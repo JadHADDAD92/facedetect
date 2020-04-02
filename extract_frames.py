@@ -57,13 +57,13 @@ def processDirectory(directoryPath: Path):
                     "directories: faces and non_faces")
 @click.argument('file')
 @click.argument('output_directory')
-@click.option('--percentage', default=1.5,
+@click.option('--percentage', default=1.5, type=D,
               help="percentage threshold of difference between two consecutive frames")
 # pylint: disable=invalid-name
-def processFile(file: str, output_directory: str, percentage: float):
+def processFile(file: str, output_directory: str, percentage: D):
     """ process video file
     """
-    percentage = D(percentage)/D(100)
+    percentage = percentage/100
     outputPath = Path(output_directory)
     
     keyframesDir = outputPath/'keyframes'
