@@ -16,7 +16,7 @@ dirname = Path(__file__).parent
 
 imgExtensions = [".jpg", ".jpeg", ".png"]
 
-def processDirectory(directoryPath):
+def processDirectory(directoryPath: Path):
     """ process files in directory
     """
     keyframesPath = directoryPath/'keyframes'
@@ -60,7 +60,7 @@ def processDirectory(directoryPath):
 @click.option('--percentage', default=1.5,
               help="percentage threshold of difference between two consecutive frames")
 # pylint: disable=invalid-name
-def processFile(file, output_directory, percentage):
+def processFile(file: str, output_directory: str, percentage: float):
     """ process video file
     """
     percentage = D(percentage)/D(100)
