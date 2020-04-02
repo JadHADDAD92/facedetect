@@ -67,7 +67,7 @@ def processFile(file, output_directory, percentage):
     outputPath = Path(output_directory)
     
     keyframesDir = outputPath/'keyframes'
-    if keyframesDir.exists() is False:
+    if not keyframesDir.exists():
         keyframesDir.mkdir()
     
     extractFrames = ['ffmpeg',
